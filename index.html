@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        input[type="text"] {
+            font-size: 1.2em;
+            padding: 5px;
+            width: 130px;
+            text-transform: uppercase;
+        }
+        button {
+            font-size: 1.2em;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .results {
+            width: 130px;
+            margin-top: 20px;
+            font-size: 1.2em;
+            line-height: 1.8em;
+        }
+        .correct {
+            color: green;
+        }
+        .wrong-position {
+            color: orange;
+        }
+    </style>
+    <script type="module">
+      import { Tiplink } from 'https://cdn.skypack.dev/@tiplink/api';
+    </script>
+</head>
+<body>
+    <h1>Wordle</h1>
+    <div class="container">
+        <input type="text" id="guess" maxlength="5" />
+        <button onclick="submitGuess()">Submit</button>
+        <div class="results" id="results"></div>
+    </div>
+    <script>
+        // JavaScript code will be added here
+const secretWord = "jamie"; // You can change this to any five-letter word
+const maxAttempts = 6;
+let attempts = 0;
+
+async function submitGuess() {
+  const guessInput = document.getElementById("guess");
+  const resultsDiv = document.getElementById("results");
+  const guess = guessInput.value.toLowerCase();
+  
+  if (guess.length !== 5) {
+    alert("Please enter a five-letter word.");
+    return;
+  }
+
+  let result = "";
+  for (let i = 0; i < guess.length; i++) {
+    if (guess[i] === secretWord[i]) {
+      result += `<span class="correct">${guess[i]}</span>`;
+    } else if (secretWord.includes(guess[i])) {
+      result += `<span class="wrong-position">${guess[i]}</span>`;
+    } else {
+      result += guess[i];
+    }
+  }
+
+  resultsDiv.innerHTML = `<div>${result}</div>` + resultsDiv.innerHTML;
+  attempts++;
+
+  if (guess === secretWord) {
+    if (attempts === 1) {
+      const tiplink = await Tiplink.create();
+      alert(`Congratulations! You've guessed the secret word on the first try! Your Tiplink: ${tiplink.url.toString()} and publicKey: ${tiplink.keypair.publicKey.toBase58()}`);
+    } else {
+      alert("Congratulations! You've guessed the secret word!");
+    }
+    location.reload();
+  } else if (attempts >= maxAttempts) {
+    alert(`You've reached the maximum attempts. The secret word was "${secretWord}".`);
+    location.reload();
+  } else {
+    guessInput.value = "";
+  }
+}
+
+    </script>
